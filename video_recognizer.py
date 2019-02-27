@@ -14,6 +14,8 @@ import pickle
 import time
 import cv2
 import os
+import sqlite3
+import datetime
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -37,6 +39,11 @@ embedder = cv2.dnn.readNetFromTorch(args["embedding_model"])
 # load the actual face recognition model along with the label encoder
 recognizer = pickle.loads(open(args["recognizer"], "rb").read())
 le = pickle.loads(open(args["le"], "rb").read())
+
+# make database connection
+db_name = 'face_db'
+conn = sqlite3.connect(db_name)
+c = conn.cursor()
 
 # initialize the video stream, then allow the camera sensor to warm up
 print("[INFO] starting video stream...")
@@ -105,13 +112,16 @@ while True:
             text = "{}: {:.2f}%".format(name, proba * 100)
             y = startY - 10 if startY - 10 > 10 else startY + 10
             cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
-            cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+            cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 0), 2)
 
     # update the FPS counter
     fps.update()
     # show the output frame
     cv2.imshow("Frame", frame)
-
+    # get current time stamp
+    currtime = str(datetime.datetime.now())
+    # execute db query
+    c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=currtime))
     # if the `escape` key was pressed, break from the loop
     if cv2.waitKey(1) & 0xFF == 27:
         break
@@ -122,5 +132,7 @@ print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 
 # do a bit of cleanup
+conn.commit()
+conn.close()
 cv2.destroyAllWindows()
 vs.stop()
