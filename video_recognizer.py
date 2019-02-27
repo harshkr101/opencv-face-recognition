@@ -119,9 +119,9 @@ while True:
     # show the output frame
     cv2.imshow("Frame", frame)
     # get current time stamp
-    currtime = str(datetime.datetime.now())
+    current_time = str(datetime.datetime.now())
     # execute db query
-    c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=currtime))
+    c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=current_time))
     # if the `escape` key was pressed, break from the loop
     if cv2.waitKey(1) & 0xFF == 27:
         break
