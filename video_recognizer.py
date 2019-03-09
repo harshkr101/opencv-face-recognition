@@ -65,7 +65,8 @@ while True:
     (h, w) = frame.shape[:2]
 
     # construct a blob from the image
-    imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
+    imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0),
+                                      swapRB=False, crop=False)
 
     # apply OpenCV's deep learning-based face detector to localize
     # faces in the input image
@@ -115,7 +116,11 @@ while True:
             # get current time stamp
             current_time = str(datetime.datetime.now())
             # execute db query
-            c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=current_time))
+            if str(name) == "Unknown":
+                pass
+            else:
+
+                c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=current_time))
 
     # update the FPS counter
     fps.update()
