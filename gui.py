@@ -26,6 +26,7 @@ class MainApp(tk.Tk):
 
         self.show_frame("StartPage")
 
+    # show the frame
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
@@ -35,6 +36,7 @@ class MainApp(tk.Tk):
         mydb.enter_data(uname, email, password)
         frame = self.frames["LoginPage"]
         frame.tkraise()
+
 
 class StartPage(tk.Frame):
 
@@ -97,7 +99,8 @@ class SignupPage(tk.Frame):
         pass_entry = tk.Entry(self, show='*', textvariable=password)
         pass_entry.place(x=200, y=140)
         print(uname, email, password)
-        signup_button = tk.Button(self, text="Submit", command=controller.enter_data(uname.get(), email.get(), password.get()))
+        signup_button = tk.Button(self, text="Submit",
+                                  command=controller.enter_data(uname.get(), email.get(), password.get()))
         signup_button.place(x=200, y=170)
 
 
