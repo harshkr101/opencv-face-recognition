@@ -41,8 +41,8 @@ recognizer = pickle.loads(open(args["recognizer"], "rb").read())
 le = pickle.loads(open(args["le"], "rb").read())
 
 # make database connection
-db_name = 'face_db'
-conn = sqlite3.connect(db_name)
+db = 'face_db'
+conn = sqlite3.connect(db)
 c = conn.cursor()
 
 # initialize the video stream, then allow the camera sensor to warm up
@@ -65,8 +65,7 @@ while True:
     (h, w) = frame.shape[:2]
 
     # construct a blob from the image
-    imageBlob = cv2.dnn.blobFromImage(
-        cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
+    imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
 
     # apply OpenCV's deep learning-based face detector to localize
     # faces in the input image
@@ -113,15 +112,16 @@ while True:
             y = startY - 10 if startY - 10 > 10 else startY + 10
             cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
             cv2.putText(frame, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 0, 0), 2)
+            # get current time stamp
+            current_time = str(datetime.datetime.now())
+            # execute db query
+            c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=current_time))
 
     # update the FPS counter
     fps.update()
     # show the output frame
     cv2.imshow("Frame", frame)
-    # get current time stamp
-    current_time = str(datetime.datetime.now())
-    # execute db query
-    c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=current_time))
+
     # if the `escape` key was pressed, break from the loop
     if cv2.waitKey(1) & 0xFF == 27:
         break
