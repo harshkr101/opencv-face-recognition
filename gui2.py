@@ -1,15 +1,12 @@
-
-
 # import modules
 
 from tkinter import *
 import os
 import mydb
-from PIL import ImageTk,Image
-from tkinter import font  as tkfont
+from PIL import ImageTk, Image
+
 
 # Designing window for registration
-
 
 
 def register():
@@ -23,9 +20,11 @@ def register():
     global email
     global username_entry
     global password_entry
+    global email_entry
+
     username = StringVar()
     password = StringVar()
-    email=StringVar()
+    email = StringVar()
 
     Label(register_screen, text="Please enter details below").pack()
     Label(register_screen, text="").pack()
@@ -37,17 +36,18 @@ def register():
     password_lable.pack()
     password_entry = Entry(register_screen, textvariable=password, show='*')
     password_entry.pack()
-    email_label = Label(register_screen, text="Email")
+    email_label = Label(register_screen, text="Email *")
     email_label.pack()
     email_entry = Entry(register_screen, textvariable=email)
     email_entry.pack()
     Label(register_screen, text="").pack()
-    Button(register_screen, text="Register", width=10, height=1, bg="blue", command=register_user).pack()
+    Button(register_screen, text="Register", width=10, height=1, command=register_user).pack()
 
 
 # Designing window for login
 
 def login():
+    main_screen.wm_minsize()
     global login_screen
     login_screen = Toplevel(main_screen)
     login_screen.title("Login")
@@ -73,6 +73,7 @@ def login():
     password_login_entry.pack()
     Label(login_screen, text="").pack()
     Button(login_screen, text="Login", width=10, height=1, command=login_verify).pack()
+    Button(login_screen, text="Register", width=10, height=1, command=register).pack()
 
 
 # Implementing event on register button
@@ -80,49 +81,55 @@ def login():
 def register_user():
     username_info = username.get()
     password_info = password.get()
-
-    #file = open(username_info, "w")
-    #file.write(username_info + "\n")
-    #file.write(password_info)
-    #file.close()
+    email_info = email.get()
+    registration_success = mydb.enter_data(str(username_info), str(email_info), str(password_info))
+    l1 = Label(register_screen, text="", font=("calibri", 11))
+    l1.pack()
+    if registration_success:
+        l1.config(text="Registration Success", fg="green")
+    else:
+        l1.config(text="Invalid Entry", fg="red")
 
     username_entry.delete(0, END)
     password_entry.delete(0, END)
-
-    Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
+    email_entry.delete(0, END)
 
 
 # Implementing event on login button
 
 def login_verify():
-    username1 = username_verify.get()
-    password1 = password_verify.get()
+    login_check = mydb.check_login(str(username_verify.get()), str(password_verify.get()))
+
     username_login_entry.delete(0, END)
     password_login_entry.delete(0, END)
 
-    list_of_files = os.listdir()
-    if username1 in list_of_files:
-        file1 = open(username1, "r")
-        verify = file1.read().splitlines()
-        if password1 in verify:
-            login_sucess()
+    if login_check:
 
-        else:
-            password_not_recognised()
+        login_sucess()
 
     else:
-        user_not_found()
+
+        login_failed()
 
 
 # Designing popup for login success
 
+
 def login_sucess():
     global login_success_screen
     login_success_screen = Toplevel(login_screen)
-    login_success_screen.title("Success")
+    login_success_screen.title("Successful login ")
     login_success_screen.geometry("150x100")
     Label(login_success_screen, text="Login Success").pack()
     Button(login_success_screen, text="OK", command=delete_login_success).pack()
+
+
+def login_failed():
+    global login_failed_screen
+    login_failed_screen = Toplevel(login_screen)
+    login_failed_screen.title("Failed")
+    Label(login_failed_screen, text="Login Failed. Check your credentials or enter data into fields").pack()
+    Button(login_failed_screen, text="OK", command=delete_login_failed).pack()
 
 
 # Designing popup for login invalid password
@@ -153,6 +160,10 @@ def delete_login_success():
     login_success_screen.destroy()
 
 
+def delete_login_failed():
+    login_failed_screen.destroy()
+
+
 def delete_password_not_recognised():
     password_not_recog_screen.destroy()
 
@@ -161,21 +172,23 @@ def delete_user_not_found_screen():
     user_not_found_screen.destroy()
 
 
+def delete_login_screen():
+    login_screen.destroy()
+
+
 # Designing Main(first) window
 
 def main_account_screen():
     global main_screen
     main_screen = Tk()
-    main_screen.title("Welcome Screen")
+    main_screen.title("Welcome")
     load = Image.open("new_logo.gif")
     render = ImageTk.PhotoImage(load)
-    img = Label( image=render)
+    img = Label(image=render)
     img.image = render
     img.pack()
-    label2 = Label( text="Welcome to face recognition system",font=tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic"))
-    label2.pack()
-    button = Button( text="Next",command=login)
-    button.pack(side="bottom")
+    button = Button(text="Next", command=login)
+    button.pack(anchor=SE)
     mainloop()
 
 

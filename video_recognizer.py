@@ -120,7 +120,7 @@ while True:
                 pass
             else:
 
-                c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="Face", n=name, time=current_time))
+                c.execute('INSERT INTO {tb} VALUES("{n}","{time}")'.format(tb="ATTENDANCE", n=name, time=current_time))
 
     # update the FPS counter
     fps.update()

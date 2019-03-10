@@ -9,27 +9,41 @@ def enter_data(uname, email, password):
     uname = str(uname)
     email = str(email)
     password = str(password)
-    line = 'INSERT INTO LOGIN VALUES("{name}","{passwd}","{email}")'.format(name=uname,passwd=password,email=email)
-    conn.execute(line)
-    conn.commit()
-    return True
+    line = 'INSERT INTO LOGIN VALUES("{name}","{passwd}","{email}")'.format(name=uname, passwd=password, email=email)
+    line2 = 'SELECT * FROM LOGIN WHERE Name="{name}"'.format(name=uname)
+    username_already_present=conn.execute(line2)
 
+    if uname == '' and password == '' and email == '':
+        return False
 
-def read_db(username, password):
-    if username == '' and password == '':
-        print('please enter the details')
+    elif username_already_present is not None:
+        return False
+
     else:
-        line = ("SELECT * FROM face_db WHERE Name= " + "'" + username + "' ")
+        conn.execute(line)
+        conn.commit()
+        return True
+
+
+def check_login(username, password):
+    if username == '' and password == '':
+        return False
+    else:
+        line = 'SELECT * FROM LOGIN WHERE Name="{name}"'.format(name=username)
         c.execute(line)
-        data = c.fetchall()
+        data = list(c.fetchall())
         for num in data:
             if num[0] == username:
                 if num[1] == password:
                     print("Your login ")
+                    return True
                 else:
-                    print("check your Password is worng")
-        if not data:
-            print("check your Name worng")
+                    print("check your Password is wrong")
+                    return False
+        if data is None:
+            print("check your data")
+            return False
 
 
-#conn.close()
+def close_connection():
+    conn.close()
