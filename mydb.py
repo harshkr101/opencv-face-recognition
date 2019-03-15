@@ -10,18 +10,21 @@ def enter_data(uname, email, password):
     email = str(email)
     password = str(password)
     line = 'INSERT INTO LOGIN VALUES("{name}","{passwd}","{email}")'.format(name=uname, passwd=password, email=email)
-    line2 = 'SELECT * FROM LOGIN WHERE Name="{name}"'.format(name=uname)
-    username_already_present=conn.execute(line2)
+    # line2 = 'SELECT * FROM LOGIN WHERE Name="{name}"'.format(name=uname)
+    # username_already_present=conn.execute(line2)
 
     if uname == '' and password == '' and email == '':
         return False
 
-    elif username_already_present is not None:
-        return False
-
     else:
-        conn.execute(line)
-        conn.commit()
+
+        try:
+            conn.execute(line)
+            conn.commit()
+        except sqlite3.IntegrityError as err:
+            print(err)
+            return False
+
         return True
 
 
