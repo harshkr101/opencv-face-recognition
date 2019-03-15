@@ -1,9 +1,11 @@
 # import modules
 
-from tkinter import *
 import os
-import mydb
+from tkinter import *
+from tkinter.filedialog import askopenfilename
 from PIL import ImageTk, Image
+
+import mydb
 
 
 # Designing window for registration
@@ -77,23 +79,22 @@ def selection():
     selection_screen.geometry("300x250")
     selection_screen.title("Make your Selection")
     Label(selection_screen, text="Recognise Face in :", font="14").pack(anchor=W)
-    rb_value1 = IntVar()
-    rb_value2 = IntVar()
-    Radiobutton(selection_screen, text="Image File", variable=rb_value1).pack(anchor=W)
-    Radiobutton(selection_screen, text="Video Stream", variable=rb_value2).pack(anchor=W)
-    radiobtn1_value = int(rb_value1.get())
-    radiobtn2_value = int(rb_value2.get())
-    print(radiobtn1_value)
-    btn = Button(selection_screen, text="Next")
-    btn.pack()
-    if radiobtn1_value:
-        btn.config(command=select_image_file)
-        print("Select image")
-    elif radiobtn2_value == 2:
-        btn.config(command=launch_video_file)
-        print("launch video")
-    else:
-        pass
+    v = IntVar()
+    Radiobutton(selection_screen, text="Image File", variable=v, value=1, command=lambda: launcher(v.get())).pack(
+        anchor=W)
+    Radiobutton(selection_screen, text="Video Stream", variable=v, value=2, command=lambda: launcher(v.get())).pack(
+        anchor=W)
+
+
+def launcher(value):
+    if value == 1:
+        image_path = askopenfilename()
+        line = "python image_recognizer.py -d face_detection_model -m openface_nn4.small2.v1.t7 -r output/recognizer.pickle -l output/le.pickle -i {}".format(
+            image_path)
+        os.system(line)
+    elif value == 2:
+        os.system(
+            "python video_recognizer.py -d face_detection_model -m openface_nn4.small2.v1.t7 -r output/recognizer.pickle -l output/le.pickle ")
 
 
 # Implementing event on register button
@@ -152,15 +153,6 @@ def login_failed():
     Button(login_failed_screen, text="OK", command=delete_login_failed).pack()
 
 
-def launch_video_file():
-    os.system(
-        "python video_recognizer.py -d face_detection_model -m openface_nn4.small2.v1.t7 -r output/recognizer.pickle -l output/le.pickle ")
-
-
-def select_image_file():
-    pass
-
-
 def register_success():
     global register_success_screen
     register_success_screen = Toplevel(login_screen)
@@ -203,7 +195,7 @@ def delete_register_failed():
     register_failed_screen.destroy()
 
 
-# Designing Main(first) window
+# Designing Main window
 
 def main_account_screen():
     global main_screen
