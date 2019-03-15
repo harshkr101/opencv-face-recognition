@@ -50,3 +50,4 @@ def check_login(username, password):
 
 def close_connection():
     conn.close()
+    print("Connection closed")

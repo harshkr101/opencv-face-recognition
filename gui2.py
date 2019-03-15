@@ -77,18 +77,20 @@ def selection():
     selection_screen.geometry("300x250")
     selection_screen.title("Make your Selection")
     Label(selection_screen, text="Recognise Face in :", font="14").pack(anchor=W)
-    rb_value = IntVar()
-    Radiobutton(selection_screen, text="Image File", variable=rb_value, value=1).pack(anchor=W)
-    Radiobutton(selection_screen, text="Video Stream", variable=rb_value, value=2).pack(anchor=W)
-    rbvalue = int(rb_value.get())
-    print(rbvalue)
+    rb_value1 = IntVar()
+    rb_value2 = IntVar()
+    Radiobutton(selection_screen, text="Image File", variable=rb_value1).pack(anchor=W)
+    Radiobutton(selection_screen, text="Video Stream", variable=rb_value2).pack(anchor=W)
+    radiobtn1_value = int(rb_value1.get())
+    radiobtn2_value = int(rb_value2.get())
+    print(radiobtn1_value)
     btn = Button(selection_screen, text="Next")
     btn.pack()
-    if rbvalue == 1:
-        btn.config(command=select_image_file())
+    if radiobtn1_value:
+        btn.config(command=select_image_file)
         print("Select image")
-    elif rbvalue == 2:
-        btn.config(command=launch_video_file())
+    elif radiobtn2_value == 2:
+        btn.config(command=launch_video_file)
         print("launch video")
     else:
         pass
@@ -215,6 +217,7 @@ def main_account_screen():
     button = Button(text="Next", command=login)
     button.pack(anchor=SE)
     mainloop()
+    mydb.close_connection()
 
 
 main_account_screen()
